@@ -75,7 +75,7 @@ printf("\nPercorrendo linhas: ");
 
                 strcpy(nis, campo);
 
-				long int num = atol (nis);
+		long int num = atol (nis);
                 int chave = chaveDivisao(num, hashSize);
 
 fseek(frb,chave * sizeof(struct index),SEEK_SET);
@@ -87,7 +87,6 @@ fread(&temp,sizeof(struct index),1,frb);
 fseek(frb,chave * sizeof(struct index),SEEK_SET);
 
                 if(strcmp(temp.nis, "\0")==0){
-				printf("Aqui");
                 fwrite(&nis,sizeof(nis),1,frb);
                 fwrite(&nova_linha,sizeof(nova_linha),1,frb);
 
@@ -99,7 +98,6 @@ fseek(frb,chave * sizeof(struct index),SEEK_SET);
 
 while(strcmp(temp.nis, "\0") != 0){
 cont++;
-printf("TO AQUI");
 fread(&temp,sizeof(struct index),1,frb);
 
 }
