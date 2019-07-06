@@ -1,0 +1,125 @@
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+
+int chaveDivisao (long int chave, int TABLE_SIZE){
+
+    return ((chave & 0x7FFFFFFF) % TABLE_SIZE);
+}
+
+struct index{
+
+char n[15];
+char linha[2048];
+};
+
+int main(){
+	
+	FILE *f1, *f2;	
+	char n[15];
+	
+	f1 = fopen("bolsa-hash.dat","rb");
+	f2 = fopen("bolsa.csv","r");
+	
+	printf("\nDigite o NIS desejado: ");
+	
+	scanf( "%s", &n);		
+
+	int	z = atol (n);
+	
+	int b = chaveDivisao(z, 14000000) ;//depende  do tamanho do HashSize utilizado para fazer o HashTable do arquivo bolsa.csv
+	
+	fseek(f1,b * sizeof(struct index),SEEK_SET);
+	
+	struct index temp;
+	
+	fread(&temp,sizeof(struct index),1,f1);
+	
+	int count = 1;
+	
+	while(strcmp(temp.n, n) != 0){
+		
+		if(!feof(f1)){
+			
+		count += 1;
+		
+		fread(&temp,sizeof(struct index),1,f1);
+	}
+		else{
+			printf("\nNao esta no arquivo!\n\nNumero de passos: %d.\n\n",count);
+			break;
+		}
+	}
+	if(strcmp(temp.n,n) == 0){
+	printf("\n\nO NIS %s foi encontrado:\n\n %s\n",temp.n, temp.linha,count);
+	printf("\nNumero de Acessos com o Index: %d\n\n", count);
+
+	}
+	 //buscando no nao indexado
+	 char nis[15];
+	 int coluna;
+	 char* campo;
+	 long posicao;
+	 char linha[15];
+	 int e;
+	 int i = 1;
+	 count = 0;
+	 
+ 	fgets(linha, 2048, f2);
+
+    posicao = ftell(f2);
+
+    fgets(linha, 2048, f2);
+    
+    char salvalinha[2048];
+    
+	while(!feof(f2))
+    {	
+    	for(e = 0; e<2048  ;e++){
+		
+		salvalinha[e] = linha[e];
+    }
+        coluna = 0;
+        campo = strtok(linha,"\t");
+        while(campo)
+        {
+            if(coluna == 7)
+            {
+                strcpy(nis, campo);
+                
+            }
+            coluna++;
+            // printf("%s\n",campo);
+            campo = strtok(NULL,"\t");
+        }
+		
+		if(strcmp(nis,n) == 0){
+			
+			printf("\n\n O NIS foi encontrado no arquivo bolsa: \n%s\n\n ",salvalinha);
+			
+			printf("\nNumero de Acessos sem o Index: %d", i);
+			
+			break;
+		}
+		count +=1;	
+        posicao = ftell(f2);
+        fgets(linha, 2048, f2);
+        i++;
+        
+        if(feof(f2))
+        {
+        	printf("\nO NIS nao existe no arquivo bolsa.\n\nNumero de passos sem index: %d",i);
+        	
+        }
+        
+        if((i % 500000)==0){
+        	printf("\n%d Percorridos\n", i);
+		}
+    }
+    
+
+	fclose(f1);
+  fclose(f2);
+    
+	return 0;
+}	
