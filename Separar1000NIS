@@ -1,0 +1,73 @@
+//Montar Lista de 1000 NIS para inserção e teste
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+#include <time.h>
+
+struct index{
+
+char n[15];
+char linha[2048];
+};
+
+int main(){
+	
+	FILE *f;
+	int cont = 0;
+    char linha[2048];
+    char nis[1000][15];
+    int n = 0;
+    int coluna = 0;
+    long posicao;
+    char* campo;
+	int hashsize = 50000;
+	fgets(linha, 2048, f);
+    posicao = ftell(f);
+    fgets(linha, 2048, f);
+	
+	f = fopen("bolsa-hash.dat","r");
+	int j;
+	int r[1000];
+
+	
+for(j=0; j<1000;j++) {
+	
+	 r[j] = rand() % hashsize;
+}
+		
+	for(j = 0; j < 1000; j++){
+	
+	srand(time(NULL));
+	//printf("%d\n", r[j]);
+		
+	fseek(f,r[j] * sizeof(struct index),SEEK_SET);
+	
+	struct index temp;
+	
+	fread(&temp,sizeof(struct index),1,f);
+	
+	int i;
+	//if(j==0){
+	for(i = 0;i< 15;i++){
+		
+		nis[j][i] = temp.n[i];
+	
+	printf("%c",nis[j][i]);
+	}
+}
+	FILE *w;
+	
+	w = fopen("1000NIS.txt","wb");
+	
+	int x;
+	
+	for(x=0;x<1000;x++)
+{
+fwrite(nis[15],sizeof(char),1000,w); 
+}
+//	fwrite(nis,sizeof(char),1,w);
+	
+	printf("NIS sepadarados em arquivo '1000NIS.txt'.");
+		
+	return 0;
+}
